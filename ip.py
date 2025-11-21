@@ -1,123 +1,226 @@
-# Image Processing Lab Codes (Python + OpenCV)
-## **1. Greyscale to Binary Conversion**
 
-import cv2
-img = cv2.imread('input.jpg', 0)
-_, binary = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY)
-cv2.imwrite('binary.jpg', binary)
-
-## **2. RGB to Greyscale Conversion**
-
-import cv2
-img = cv2.imread('input.jpg')
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-cv2.imwrite('gray.jpg', gray)
-
-## **3. Add Border to an Image**
-
-import cv2
-img = cv2.imread('input.jpg')
-border = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=[0,0,0])
-cv2.imwrite('bordered.jpg', border)
-
-## **4. Complement of an Image**
-
-import cv2
-img = cv2.imread('input.jpg')
-complement = 255 - img
-cv2.imwrite('complement.jpg', complement)
-
-## **5. Log Transform**
-
+#Q1 Grayscale to Binary
 import cv2
 import numpy as np
-img = cv2.imread('input.jpg', 0)
-c = 255 / np.log(1 + np.max(img))
-log_img = c * (np.log(img + 1))
-log_img = np.array(log_img, dtype=np.uint8)
-cv2.imwrite('log.jpg', log_img)
+from google.colab.patches import cv2_imshow
 
-## **6. Power Law Transform (Gamma Correction)**
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+mean_thresh=img.mean()
+_,binary_mean=cv2.threshold(img,mean_thresh,255,cv2.THRESH_BINARY)
 
+user_threshold=int(input("enter threshold value(0-255)"))
+_,binary_user=cv2.threshold(img,user_threshold,255,cv2.THRESH_BINARY)
+
+cv2_imshow(img)
+cv2_imshow(binary_mean)
+cv2_imshow(binary_user)
+
+#Q2 RGB to Grayscale
 import cv2
 import numpy as np
-img = cv2.imread('input.jpg', 0)
-gamma = 2.2
-norm = img / 255.0
-power = np.power(norm, gamma)
-out = np.uint8(power * 255)
-cv2.imwrite('power.jpg', out)
+from google.colab.patches import cv2_imshow
 
-## **7. Contrast Stretching**
+img=cv2.imread('quiet.png')
+b,g,r=cv2.split(img)
+#case 1
+gray1=((r+g+b)/3).astype(np.uint8)
 
+#case 2
+wr=float(input("red"))
+wg=float(input("green"))
+wb=float(input("blue"))
+gray2=(wr*r+wg*g+wb*b).astype(np.uint8)
+
+cv2_imshow(img)
+cv2_imshow(gray1)
+cv2_imshow(gray2)
+
+#Q3 PUT BORDER
 import cv2
 import numpy as np
-img = cv2.imread('input.jpg', 0)
-min_val = np.min(img)
-max_val = np.max(img)
-stretched = (img - min_val) * (255 / (max_val - min_val))
-stretched = np.uint8(stretched)
-cv2.imwrite('contrast_stretch.jpg', stretched)
+from google.colab.patches import cv2_imshow
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
 
-## **8. Histogram Equalization**
+border_width=int(input("border width:"))
+border_colour=int(input("border color"))
 
-import cv2
-img = cv2.imread('input.jpg', 0)
-eq = cv2.equalizeHist(img)
-cv2.imwrite('hist_eq.jpg', eq)
+bordered=cv2.copyMakeBorder(img,border_width,border_width,border_width,border_width,cv2.BORDER_CONSTANT,value=border_colour)
+cv2_imshow(img)
+cv2_imshow(bordered)
 
-## **9. Histogram Matching**
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
+#Q4 Complement
 import cv2
 import numpy as np
+from google.colab.patches import cv2_imshow
+
+img=cv2.imread('quiet.png')
+complement=255-img
+cv2_imshow(img)
+cv2_imshow(complement)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q5
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+
+c=1
+log_tf=c*np.log1p(img.astype(np.float32))
+log_tf=cv2.normalize(log_tf,None,0,255,cv2.NORM_MINMAX)
+log_tf=np.uint8(log_tf)
+
+cv2_imshow(img)
+cv2_imshow(log_tf)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q6
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+
+c=1
+gamma=float(input("enter gamma vakue"))
+power_tf=c*np.power(img/255.0,gamma)
+power_tf=np.uint8(power_tf*255)
+cv2_imshow(img)
+cv2_imshow(power_tf)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q7
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+
+r1=int(input("enter r1: "))
+s1=int(input("enter s1: "))
+r2=int(input("enter r2: "))
+s2=int(input("enter s2: "))
+
+out=np.zeros_like(img,dtype=np.float32)
+out=np.zeros_like(img,dtype=np.float32)
+out = ((img - r1) * ((s2 - s1) / (r2 - r1))) + s1
+out=np.clip(out,0,255).astype(np.uint8)
+out=np.clip(out,1,255).astype(np.uint8)
+
+cv2_imshow(img)
+cv2_imshow(out)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q8
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+eq_hist=cv2.equalizeHist(img)
+cv2_imshow(img)
+cv2_imshow(eq_hist)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q9
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
 from skimage.exposure import match_histograms
 
-src = cv2.imread('source.jpg', 0)
-ref = cv2.imread('reference.jpg', 0)
-matched = match_histograms(src, ref)
-cv2.imwrite('matched.jpg', matched)
+inim=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+refim=cv2.imread('independence day.jpg',cv2.IMREAD_GRAYSCALE)
+output=match_histograms(inim,refim)
+cv2_imshow(inim)
+cv2_imshow(refim)
+cv2_imshow(output.astype(np.uint8))
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
-## **10. Image Smoothening (Blurring)**
 
-import cv2
-img = cv2.imread('input.jpg')
-blur = cv2.GaussianBlur(img, (5,5), 0)
-cv2.imwrite('smooth.jpg', blur)
-
-## **11. Bit Plane Slicing**
-
+#Q10
 import cv2
 import numpy as np
-img = cv2.imread('input.jpg', 0)
-bits = []
-for i in range(8):
-    bit = (img >> i) & 1
-    bit_img = bit * 255
-    cv2.imwrite(f'bitplane_{i}.jpg', bit_img)
+from google.colab.patches import cv2_imshow
+img = cv2.imread('quiet.png', cv2.IMREAD_GRAYSCALE)
 
-## **12. Image Sharpening**
+#inuts
+pads=int(input("enter padding: 1-zeropadding, 2-Replicatepadding"))
+if pads==1:
+  pad_type=cv2.BORDER_CONSTANT
+else:
+  pad_type=cv2.BORDER_REPLICATE
 
+f=int(input("enter filter size in odd numbers"))
+sigma=float(input("enter sigma for gaussian filter"))
+
+#Averaging filter
+avg_f=np.ones((f,f),np.float32)/(f*f)
+avg_img=cv2.filter2D(img,-1,avg_f,borderType=pad_type)
+
+#Custom filter
+custom_filter=np.array([[0,-1,0],[-1,5,-1],[0,-1,0]],dtype=np.float32)
+custom_img=cv2.filter2D(img,-1,custom_filter,borderType=pad_type)
+
+#Gaussian filter
+gaussian_img=cv2.GaussianBlur(img,(f,f),sigma,borderType=pad_type)
+
+
+cv2_imshow(img)
+cv2_imshow(avg_img)
+cv2_imshow(custom_img)
+cv2_imshow(gaussian_img)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#Q11
 import cv2
 import numpy as np
-img = cv2.imread('input.jpg', 0)
-kernel = np.array([[0,-1,0],[-1,5,-1],[0,-1,0]])
-sharp = cv2.filter2D(img, -1, kernel)
-cv2.imwrite('sharpen.jpg', sharp)
+from google.colab.patches import cv2_imshow
 
-## **13. Implement CNN (Simple Classification Using Keras)**
+img=cv2.imread('quiet.png',cv2.IMREAD_GRAYSCALE)
+if img is None:
+  print("error")
+else:
+  print("load")
 
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
-model = Sequential([
-    Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),
-    MaxPooling2D((2,2)),
-    Conv2D(64, (3,3), activation='relu'),
-    MaxPooling2D((2,2)),
-    Flatten(),
-    Dense(128, activation='relu'),
-    Dense(10, activation='softmax')
-])
+#inputs
+pad=int(input("enter padding 1-o,2-replicate"))
+pad_type=cv2.BORDER_CONSTANT if pad==1 else cv2.BORDER_REPLICATE
+k=int(input("enter kernel size(odd num)"))
+sigma=float(input("enter sigma for Gaussian unmaksing"))
 
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+#laplacian
+laplacian=cv2.Laplacian(img,cv2.CV_64F,ksize=k,borderType=pad_type)
+laplacian=np.uint8(np.absolute(laplacian))
+
+#sobel
+sobel_x=cv2.Sobel(img,cv2.CV_64F,1,0,ksize=k,borderType=pad_type)
+sobel_x=np.uint8(np.absolute(sobel_x))
+
+sobel_y=cv2.Sobel(img,cv2.CV_64F,0,1,ksize=k,borderType=pad_type)
+sobel_y=np.uint8(np.absolute(sobel_y))
+
+#canny
+canny_edges=cv2.Canny(img,100,200)
+
+#unsharpmaksing
+blur=cv2.GaussianBlur(img,(k,k),sigma,borderType=pad_type)
+mask=img-blur
+unsharp=img+1.5*mask
+unsharp=np.clip(unsharp,0,255).astype(np.uint8)
+
+cv2_imshow(img)
+cv2_imshow(laplacian)
+cv2_imshow(sobel_x)
+cv2_imshow(sobel_y)
+cv2_imshow(canny_edges)
+cv2_imshow(unsharp)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+[for gaussian blur,k=5,sigma =3]
